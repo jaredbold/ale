@@ -114,11 +114,11 @@ function! ale#util#Open(filename, line, column, options) abort
     normal! zz
 endfunction
 
-let g:ale#util#error_priority = 5
-let g:ale#util#warning_priority = 4
+let g:ale#util#error_priority = 1
+let g:ale#util#warning_priority = 2
 let g:ale#util#info_priority = 3
-let g:ale#util#style_error_priority = 2
-let g:ale#util#style_warning_priority = 1
+let g:ale#util#style_error_priority = 4
+let g:ale#util#style_warning_priority = 5
 
 function! ale#util#GetItemPriority(item) abort
     if a:item.type is# 'I'
@@ -161,6 +161,17 @@ function! ale#util#LocItemCompare(left, right) abort
         endif
     endif
 
+    let l:left_priority = ale#util#GetItemPriority(a:left)
+    let l:right_priority = ale#util#GetItemPriority(a:right)
+
+    if l:left_priority < l:right_priority
+        return -1
+    endif
+
+    if l:left_priority > l:right_priority
+        return 1
+    endif
+
     if a:left.lnum < a:right.lnum
         return -1
     endif
@@ -181,17 +192,6 @@ function! ale#util#LocItemCompare(left, right) abort
     " be considered equal. This is important for loclist jumping.
     if !has_key(a:left, 'type') || !has_key(a:right, 'type')
         return 0
-    endif
-
-    let l:left_priority = ale#util#GetItemPriority(a:left)
-    let l:right_priority = ale#util#GetItemPriority(a:right)
-
-    if l:left_priority < l:right_priority
-        return -1
-    endif
-
-    if l:left_priority > l:right_priority
-        return 1
     endif
 
     return 0
